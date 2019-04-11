@@ -3,6 +3,8 @@ import json
 import traceback
 import itertools
 
+tracker = 1
+
 def fetch_input(message="input"):
 	''' take input from user '''
 
@@ -14,10 +16,12 @@ def fetch_input(message="input"):
 
 	return user_input
 
-def get_question_details(no_of_questions):
+def get_question_details(no_of_questions, questions_map=[]):
+	'''  '''
+
+	# questions_map, counter = [], 1
 	unique_questions, counter = [], 1
 	flag, error_retries = False, 0
-	questions_map = []
 
 	def error_log(message=''):
 		''' error print '''
@@ -26,42 +30,55 @@ def get_question_details(no_of_questions):
 
 		print(message)
 
-	print('\n\nEnter Question Name (unique), Difficulty (easy, medium or hard), Marks (integer) - '\
-		+ '(separated by space, comma or tilda)')
+	if len(questions_map) == 0:
+		print('\n\nEnter Question Name (unique), Difficulty (easy, medium or hard), Marks (integer) - '\
+			+ '(separated by space, comma or tilda)')
 
-	while counter <= no_of_questions:
-		if error_retries > 5:
-			flag = True
-			error_log('Max retries reached!')
-			break
+		while counter <= no_of_questions:
+			if error_retries > 5:
+				flag = True
+				error_log('Max retries reached!')
+				break
 
-		temp = fetch_input("Details for Question {0}".format(counter))
+			temp = fetch_input("Details for Question {0}".format(counter))
 
-		delimeter = ',' if ',' in temp else '~' if '~' in temp else ' ' if ' ' in temp else None
+			delimeter = ',' if ',' in temp else '~' if '~' in temp else ' ' if ' ' in temp else None
 
-		if not delimeter:
-			error_retries += 1
-			error_log()
-			continue
+			if not delimeter:
+				error_retries += 1
+				error_log()
+				continue
 
-		temp = [d.strip() for d in temp.split(delimeter)]
-		if len(temp) < 3 or temp[0] in unique_questions or not temp[2].isdigit() or \
-			temp[1] not in ['easy', 'medium', 'hard']:
-			error_retries += 1
-			error_log()
-			continue
+			temp = [d.strip() for d in temp.split(delimeter)]
+			if len(temp) < 3 or temp[0] in unique_questions or not temp[2].isdigit() or \
+				temp[1] not in ['easy', 'medium', 'hard']:
+				error_retries += 1
+				error_log()
+				continue
 
-		questions_map.append({'question': temp[0], 'difficulty': temp[1], 'marks': int(temp[2])})
-		unique_questions.append(temp[0])
-		counter += 1
+			questions_map.append({'question': temp[0], 'difficulty': temp[1], 'marks': int(temp[2])})
+			unique_questions.append(temp[0])
+			counter += 1
+	else:
+		for d in questions_map:
+			if len(d) < 3 or d['question'] in unique_questions or \
+				not d['difficulty'] in ['easy', 'medium', 'hard'] or \
+				not str(d['marks']).isdigit():
+				print('Question details incorrect (in file)!')
+				flag = True
+				break
+
+			d['marks'] = int(d['marks'])
+			unique_questions.append(d['question'])
 
 	if flag or error_retries>=5:
 		return
 
-	print(questions_map)
 	return questions_map
 
-def get_question_paper_details():
+def get_question_paper_details(question_paper_map={}):
+	''' '''
+
 	def error_log(message=''):
 		''' error print '''
 		if not message:
@@ -69,28 +86,29 @@ def get_question_paper_details():
 
 		print(message)
 
-	print('\nEnter Question Paper details - Total Marks (integer), '\
-		+ 'Percentage weightage for each distinct difficulty level (comma separated)')
-	print('ex:- 20, easy 25, medium 50, hard 25')
+	if len(question_paper_map) == 0:
+		print('\nEnter Question Paper details - Total Marks (integer), '\
+			+ 'Percentage weightage for each distinct difficulty level (comma separated)')
+		print('ex:- 20, easy 25, medium 50, hard 25')
 
-	question_paper_details = fetch_input()
-	question_paper_map = {}
+		question_paper_details = fetch_input()
+		# question_paper_map = {}
 
-	temp = [d.strip() for d in question_paper_details.split(',')]
-	if len(temp) < 4:
-		print('Question paper details not correctly entered')
-		question_paper_map = get_question_paper_details_v2()
-	else:
-		question_paper_map['total_marks'] = temp[0]
-		question_paper_map['difficulty'] = {}
-		for d in temp[1:4]:
-			diff = d.split(' ')
-			if len(diff) < 2:
-				print('Question paper details not correctly entered')
-				question_paper_map = get_question_paper_details_v2()
-				break
-			else:
-				question_paper_map['difficulty'][diff[0]] = diff[1]
+		temp = [d.strip() for d in question_paper_details.split(',')]
+		if len(temp) < 4:
+			print('Question paper details not correctly entered')
+			question_paper_map = get_question_paper_details_v2()
+		else:
+			question_paper_map['total_marks'] = temp[0]
+			question_paper_map['difficulty'] = {}
+			for d in temp[1:4]:
+				diff = d.split(' ')
+				if len(diff) < 2:
+					print('Question paper details not correctly entered')
+					question_paper_map = get_question_paper_details_v2()
+					break
+				else:
+					question_paper_map['difficulty'][diff[0]] = diff[1]
 
 	if (not str(question_paper_map['total_marks']).isdigit()) or \
 		(not str(question_paper_map['difficulty']['easy']).isdigit()) or \
@@ -165,33 +183,42 @@ def generate_questions(q_map, qp_map):
 def controller(user=True, file_data={}):
 	''' main flow controller '''
 
-	# input number of questions
-	try:
-		no_of_questions = fetch_input("Total number of questions")
-		no_of_questions = int(no_of_questions)
-	except ValueError:
-		print('Please enter an integer to denote number of questions!')
-		return
+	global tracker
+
+	if user:
+		# input number of questions
+		try:
+			no_of_questions = fetch_input("Total number of questions")
+			no_of_questions = int(no_of_questions)
+		except ValueError:
+			print('Please enter an integer to denote number of questions!')
+			return
+	elif file_data:
+		no_of_questions = file_data['total_questions']
 
 	if no_of_questions <= 0:
 		print('No. of questions cannot be zero or lower in paper!')
 		return
 
 	# get question details
-	questions_map = get_question_details(no_of_questions)
+	questions_map = file_data.get('question_details', [])
+	questions_map = get_question_details(no_of_questions, questions_map)
 
 	if not questions_map:
 		return
 
 	# get details for setting question paper
-	question_paper_map = get_question_paper_details()
+	question_paper_map = file_data.get('question_paper_details', {})
+	question_paper_map = get_question_paper_details(question_paper_map)
 
 	if not question_paper_map:
 		# print('Invalid format for question paper details. Please try again.')
 		return
 
+	# print(questions_map, question_paper_map)
 	selector = generate_questions(questions_map, question_paper_map)
-	print('Selected Questions - ',  ' , '.join(selector))
+	print('Selected Questions - %s -' % tracker, ' , '.join(selector))
+	tracker += 1
 
 if __name__ == "__main__":
 
