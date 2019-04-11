@@ -1,0 +1,16 @@
+[
+	{
+		"total_questions": "",
+		"question_details": [
+			{"question": "", "difficulty": "", "marks": ""}
+		],
+		"question_paper_details": {
+			"total_marks": "",
+			"difficulty": {
+				"easy": "",
+				"medium": "",
+				"hard": ""
+			}
+		}
+	}
+]

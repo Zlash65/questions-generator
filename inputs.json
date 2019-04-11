@@ -1,0 +1,25 @@
+[
+	{
+		"total_questions": 10,
+		"question_details": [
+			{"question": "Q1", "difficulty": "easy", "marks": "1"},
+			{"question": "Q2", "difficulty": "easy", "marks": "2"},
+			{"question": "Q3", "difficulty": "medium", "marks": "2"},
+			{"question": "Q4", "difficulty": "hard", "marks": "9"},
+			{"question": "Q5", "difficulty": "easy", "marks": "3"},
+			{"question": "Q6", "difficulty": "hard", "marks": "7"},
+			{"question": "Q7", "difficulty": "medium", "marks": "3"},
+			{"question": "Q8", "difficulty": "easy", "marks": "3"},
+			{"question": "Q9", "difficulty": "medium", "marks": "5"},
+			{"question": "Q10", "difficulty": "hard", "marks": "5"}
+		],
+		"question_paper_details": {
+			"total_marks": 20,
+			"difficulty": {
+				"easy": 25,
+				"medium": 50,
+				"hard": 25
+			}
+		}
+	}
+]
