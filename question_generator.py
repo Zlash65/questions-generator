@@ -76,6 +76,7 @@ def get_question_paper_details():
 	temp = [d.strip() for d in question_paper_details.split(',')]
 	if len(temp) < 4:
 		print('Question paper details not correctly entered')
+		question_paper_map = get_question_paper_details_v2()
 	else:
 		question_paper_map['total_marks'] = temp[0]
 		question_paper_map['difficulty'] = {}
@@ -83,28 +84,53 @@ def get_question_paper_details():
 			diff = d.split(' ')
 			if len(diff) < 2:
 				print('Question paper details not correctly entered')
+				question_paper_map = get_question_paper_details_v2()
 				break
 			else:
 				question_paper_map['difficulty'][diff[0]] = diff[1]
 
-	try:
-		if (not str(question_paper_map['total_marks']).isdigit()) or \
-			(not str(question_paper_map['difficulty']['easy']).isdigit()) or \
-			(not str(question_paper_map['difficulty']['medium']).isdigit()) or \
-			(not str(question_paper_map['difficulty']['hard']).isdigit()):
-			error_log()
-			return
-
-		if (int(question_paper_map['difficulty']['easy'])+int(question_paper_map['difficulty']['medium'])+int(question_paper_map['difficulty']['hard'])) != 100:
-			error_log("Weightage didn't add up to 100")
-			return
-
-		question_paper_map['total_marks'] = int(question_paper_map['total_marks'])
-		question_paper_map['difficulty'] = {k: int(v) for k,v in question_paper_map['difficulty'].items()}
-		return question_paper_map
-	except:
+	if (not str(question_paper_map['total_marks']).isdigit()) or \
+		(not str(question_paper_map['difficulty']['easy']).isdigit()) or \
+		(not str(question_paper_map['difficulty']['medium']).isdigit()) or \
+		(not str(question_paper_map['difficulty']['hard']).isdigit()):
 		error_log()
 		return
+
+	if (int(question_paper_map['difficulty']['easy'])+int(question_paper_map['difficulty']['medium'])+int(question_paper_map['difficulty']['hard'])) != 100:
+		error_log("Weightage didn't add up to 100")
+		return
+
+	question_paper_map['total_marks'] = int(question_paper_map['total_marks'])
+	question_paper_map['difficulty'] = {k: int(v) for k,v in question_paper_map['difficulty'].items()}
+	return question_paper_map
+
+def get_question_paper_details_v2():
+	''' a more verbose method for taking input '''
+
+	print('\nLets try another way')
+	while True:
+		total_marks = fetch_input('Enter total marks for the paper')
+		if not total_marks.isdigit():
+			print('Please enter an integer to denote marks')
+		else:
+			break
+
+	while True:
+		easy = fetch_input('Enter weightage for difficulty level - easy')
+		medium = fetch_input('Enter weightage for difficulty level - medium')
+		hard = fetch_input('Enter weightage for difficulty level - hard')
+
+		if not easy.isdigit() or not medium.isdigit() or not hard.isdigit():
+			print('Please enter an integer to denote percentage weight out of 100')
+			continue
+
+		# break the loop if no issue encountered
+		break
+
+	question_paper_map = {'total_marks': total_marks, 'difficulty': {'easy': easy,
+		'medium': medium, 'hard': hard}}
+
+	return question_paper_map
 
 def controller():
 	''' main flow controller '''
