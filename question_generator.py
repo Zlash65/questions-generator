@@ -1,4 +1,5 @@
 import json
+import itertools
 
 def fetch_input(message="input"):
 	''' take input from user '''
@@ -132,6 +133,29 @@ def get_question_paper_details_v2():
 
 	return question_paper_map
 
+def generate_questions(q_map, qp_map):
+	''' selects questions based on paper configuration '''
+
+	total_marks = qp_map['total_marks']
+
+	questions = []
+	for k, v in qp_map['difficulty'].items():
+		marks = [d['marks'] for d in q_map if d['difficulty'] == k]
+		weight = int(total_marks * v / 100)
+
+		result = [seq for i in range(len(marks), 0, -1) for seq in itertools.combinations(marks, i) \
+			if sum(seq) == weight]
+		min_data = min(result, key=len)
+
+		temp_map = {d['question']: d['marks'] for d in q_map if d['difficulty'] == k}
+		for d in min_data:
+			q = [i for i, j in temp_map.items() if j == d][0]
+			temp_map.pop(q, None)
+			questions.append(q)
+
+	# print(questions)
+	return questions
+
 def controller():
 	''' main flow controller '''
 
@@ -159,6 +183,9 @@ def controller():
 	if not question_paper_map:
 		# print('Invalid format for question paper details. Please try again.')
 		return
+
+	selector = generate_questions(questions_map, question_paper_map)
+	print('Selected Questions - ',  ' , '.join(selector))
 
 if __name__ == "__main__":
 	# main controller
