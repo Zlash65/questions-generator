@@ -11,21 +11,7 @@ def fetch_input(message="input"):
 
 	return user_input
 
-def controller():
-	''' main flow controller '''
-
-	# input number of questions
-	try:
-		no_of_questions = fetch_input("Total number of questions")
-		no_of_questions = int(no_of_questions)
-	except ValueError:
-		print('Please enter an integer to denote number of questions!')
-		return
-
-	if no_of_questions <= 0:
-		print('No. of questions cannot be zero or lower in paper!')
-		return
-
+def get_question_details(no_of_questions):
 	unique_questions, counter = [], 1
 	flag, error_retries = False, 0
 	questions_map = []
@@ -71,6 +57,27 @@ def controller():
 
 	print(questions_map)
 	return questions_map
+
+def controller():
+	''' main flow controller '''
+
+	# input number of questions
+	try:
+		no_of_questions = fetch_input("Total number of questions")
+		no_of_questions = int(no_of_questions)
+	except ValueError:
+		print('Please enter an integer to denote number of questions!')
+		return
+
+	if no_of_questions <= 0:
+		print('No. of questions cannot be zero or lower in paper!')
+		return
+
+	# get question details
+	questions_map = get_question_details(no_of_questions)
+
+	if not questions_map:
+		return
 
 if __name__ == "__main__":
 	# main controller
