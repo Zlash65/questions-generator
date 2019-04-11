@@ -26,6 +26,52 @@ def controller():
 		print('No. of questions cannot be zero or lower in paper!')
 		return
 
+	unique_questions, counter = [], 1
+	flag, error_retries = False, 0
+	questions_map = []
+
+	def error_log(message=''):
+		''' error print '''
+		if not message:
+			message = 'Question details not entered correctly. Please enter again'
+
+		print(message)
+
+	print('\n\nEnter Question Name (unique), Difficulty (easy, medium or hard), Marks (integer) - '\
+		+ '(separated by space, comma or tilda)')
+
+	while counter <= no_of_questions:
+		if error_retries > 5:
+			flag = True
+			error_log('Max retries reached!')
+			break
+
+		temp = fetch_input("Details for Question {0}".format(counter))
+
+		delimeter = ',' if ',' in temp else '~' if '~' in temp else ' ' if ' ' in temp else None
+
+		if not delimeter:
+			error_retries += 1
+			error_log()
+			continue
+
+		temp = [d.strip() for d in temp.split(delimeter)]
+		if len(temp) < 3 or temp[0] in unique_questions or not temp[2].isdigit() or \
+			temp[1] not in ['easy', 'medium', 'hard']:
+			error_retries += 1
+			error_log()
+			continue
+
+		questions_map.append({'question': temp[0], 'difficulty': temp[1], 'marks': int(temp[2])})
+		unique_questions.append(temp[0])
+		counter += 1
+
+	if flag or error_retries>=5:
+		return
+
+	print(questions_map)
+	return questions_map
+
 if __name__ == "__main__":
 	# main controller
 	controller()
