@@ -147,6 +147,10 @@ def generate_questions(q_map, qp_map):
 
 		result = [seq for i in range(len(marks), 0, -1) for seq in itertools.combinations(marks, i) \
 			if sum(seq) == weight]
+
+		if not result:
+			continue
+
 		min_data = min(result, key=len)
 
 		temp_map = {d['question']: d['marks'] for d in q_map if d['difficulty'] == k}
