@@ -58,6 +58,54 @@ def get_question_details(no_of_questions):
 	print(questions_map)
 	return questions_map
 
+def get_question_paper_details():
+	def error_log(message=''):
+		''' error print '''
+		if not message:
+			message = 'Question paper details entered improperly.'
+
+		print(message)
+
+	print('\nEnter Question Paper details - Total Marks (integer), '\
+		+ 'Percentage weightage for each distinct difficulty level (comma separated)')
+	print('ex:- 20, easy 25, medium 50, hard 25')
+
+	question_paper_details = fetch_input()
+	question_paper_map = {}
+
+	temp = [d.strip() for d in question_paper_details.split(',')]
+	if len(temp) < 4:
+		print('Question paper details not correctly entered')
+	else:
+		question_paper_map['total_marks'] = temp[0]
+		question_paper_map['difficulty'] = {}
+		for d in temp[1:4]:
+			diff = d.split(' ')
+			if len(diff) < 2:
+				print('Question paper details not correctly entered')
+				break
+			else:
+				question_paper_map['difficulty'][diff[0]] = diff[1]
+
+	try:
+		if (not str(question_paper_map['total_marks']).isdigit()) or \
+			(not str(question_paper_map['difficulty']['easy']).isdigit()) or \
+			(not str(question_paper_map['difficulty']['medium']).isdigit()) or \
+			(not str(question_paper_map['difficulty']['hard']).isdigit()):
+			error_log()
+			return
+
+		if (int(question_paper_map['difficulty']['easy'])+int(question_paper_map['difficulty']['medium'])+int(question_paper_map['difficulty']['hard'])) != 100:
+			error_log("Weightage didn't add up to 100")
+			return
+
+		question_paper_map['total_marks'] = int(question_paper_map['total_marks'])
+		question_paper_map['difficulty'] = {k: int(v) for k,v in question_paper_map['difficulty'].items()}
+		return question_paper_map
+	except:
+		error_log()
+		return
+
 def controller():
 	''' main flow controller '''
 
@@ -77,6 +125,13 @@ def controller():
 	questions_map = get_question_details(no_of_questions)
 
 	if not questions_map:
+		return
+
+	# get details for setting question paper
+	question_paper_map = get_question_paper_details()
+
+	if not question_paper_map:
+		# print('Invalid format for question paper details. Please try again.')
 		return
 
 if __name__ == "__main__":
