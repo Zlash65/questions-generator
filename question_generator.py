@@ -1,4 +1,6 @@
+import argparse
 import json
+import traceback
 import itertools
 
 def fetch_input(message="input"):
@@ -156,7 +158,7 @@ def generate_questions(q_map, qp_map):
 	# print(questions)
 	return questions
 
-def controller():
+def controller(user=True, file_data={}):
 	''' main flow controller '''
 
 	# input number of questions
@@ -188,5 +190,32 @@ def controller():
 	print('Selected Questions - ',  ' , '.join(selector))
 
 if __name__ == "__main__":
-	# main controller
-	controller()
+
+	# construct the argument parse and parse the arguments
+	ap = argparse.ArgumentParser()
+
+	ap.add_argument("-f", type=str, help="path to input json")
+	ap.add_argument("--file", type=str, help="path to input json")
+	args = vars(ap.parse_args())
+
+	if args['file'] or args['f']:
+		try:
+			if args['file'] == 'default' or args['f'] == 'default':
+				args['file'] = "inputs.json"
+
+			with open(args['file']) as file_obj:
+				data = json.loads(file_obj.read())
+
+				if isinstance(data, (list, tuple)):
+					for d in data:
+						controller(user=False, file_data=d)
+				elif isinstance(data, dict):
+					controller(user=False, file_data=data)
+				else:
+					print("Cannot parse the file")
+
+		except:
+			print("Cannot open the file.")
+			# traceback.print_exc()
+	else:
+		controller(user=True)
