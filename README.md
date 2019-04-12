@@ -11,12 +11,12 @@ python question_generator.py
 # to run from a file
 # takes file input in json format only
 python question_generator.py -f 'complete path to the file'
-python question_generator.py -file 'complete path to the file'
+python question_generator.py --file 'complete path to the file'
 
 # to run sample input
 # or changes made in inputs file of repo
 python question_generator.py -f default
-python question_generator.py -file default
+python question_generator.py --file default
 
 ```
 
